@@ -1,3 +1,4 @@
+using BackEnd;
 namespace BackEnd
 {
     public class Program
@@ -5,9 +6,12 @@ namespace BackEnd
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                ?? "Data Source=conferences.db";
 
             // Add services to the container.
             builder.Services.AddAuthorization();
+            builder.Services.AddSqlite<BackEnd.Models.ApplicationDbContext>(connectionString);
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -21,6 +25,12 @@ namespace BackEnd
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+                        if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+};
 
             app.UseHttpsRedirection();
 
@@ -44,6 +54,8 @@ namespace BackEnd
                 return forecast;
             })
             .WithName("GetWeatherForecast");
+
+                        app.MapSpeakerEndpoints();
 
             app.Run();
         }
